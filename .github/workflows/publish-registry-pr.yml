@@ -31,8 +31,13 @@ jobs:
             exit 1
           fi
           echo "PR_NUMBER=$pr_number" >> $GITHUB_ENV
-      - name: Publish
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12'
+      - name: publish
         run: |
+          sudo apt-get install tree
+          npm install -g surge
           sudo apt-get install tree
           mkdir unpacked
           tar zxvf content/*.tgz -C unpacked/
