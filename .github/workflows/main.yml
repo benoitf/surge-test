@@ -32,6 +32,6 @@ jobs:
         docker pull quay.io/eclipse/che-plugin-registry:nightly
         docker build -f ${FROM_FILE} -t local-plugin-registry .
         docker create --name pluginRegistry local-plugin-registry bash
-        docker cp pluginRegistry:/var/www/html/v3/ /v3
+        docker cp pluginRegistry:/var/www/html/v3 v3
         docker rm -f pluginRegistry
         ls -la v3
