@@ -35,7 +35,7 @@ jobs:
         run: |
           sudo apt-get install tree
           mkdir unpacked
-          tar zxvf content/*.tgz unpacked/
+          tar zxvf content/*.tgz -C unpacked/
           ls -la unpacked/
           for directory in `find unpacked/ -type d`
             do
