@@ -47,7 +47,7 @@ jobs:
     needs: [image-build]
     steps:
      - name: Store PR number
-       if: github.event_name == 'pull_request'
+       if: ${{ github.event_name == 'pull_request' }}
        run: |
          echo "${{ github.event.number }}" > PR_NUMBER
      - uses: actions/upload-artifact@v2
