@@ -8,6 +8,7 @@ on:
 
 jobs:
   publish:
+    if: github.event.workflow_run.event == 'pull_request'
     name: publish
     runs-on: ubuntu-20.04
     steps:
@@ -17,7 +18,20 @@ jobs:
           workflow: ${{ github.event.workflow_run.workflow_id }}
           name: plugin-registry-content-alpine
           path: content
-      - name: generate-tree
+      - name: PR number
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: ${{ github.event.workflow_run.workflow_id }}
+          name: pr-info
+      - name: Apply pull request environment
+        run: |
+          pr_number=$(cat "PR_NUMBER")
+          if ! [[ "$pr_number" =~ ^[0-9]+$ ]]; then
+            echo "pr number invalid"
+            exit 1
+          fi
+          echo "PR_NUMBER=$pr_number" >> $GITHUB_ENV
+      - name: Publish
         run: |
           sudo apt-get install tree
           tar zxvf content/*.tgz
@@ -28,3 +42,5 @@ jobs:
            done
            ls -la content/v3
            cat content/v3/index.html
+           export DEPLOY_DOMAIN=https://pr-check-${PR_NUMBER}-che-plugin-registry.surge.sh
+           
