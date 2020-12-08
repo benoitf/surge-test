@@ -52,6 +52,8 @@ jobs:
            for file in `find unpacked -name "meta.yaml"`                                                                                                     ✔  12.19.1   docker-desktop ⎈
              do
                PARENT_DIR=$(dirname $file);
+               echo "file is $file and PARENT_DIR is ${PARENT_DIR}"
+               echo "cp ${PARENT_DIR}/meta.yaml ${PARENT_DIR}/index.html"
                cp ${PARENT_DIR}/meta.yaml ${PARENT_DIR}/index.html
              done
            export DEPLOY_DOMAIN=https://pr-check-${PR_NUMBER}-che-plugin-registry.surge.sh
