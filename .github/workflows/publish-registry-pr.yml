@@ -87,5 +87,5 @@ jobs:
            console.log('owner is', owner);
            console.log('pr SHA is', process.env.PR_SHA);
            console.log('DEPLOY_DOMAIN is', process.env.DEPLOY_DOMAIN);
-           const prSha = context.payload.pull_request.head.sha;
+           const prSha = process.env.PR_SHA;
            await github.repos.createCommitStatus({ owner, repo, sha: prSha, state: "success", target_url: process.env.DEPLOY_DOMAIN, description: "Browse registry content (${{matrix.dist}}) documentation live", context: "surge(${{matrix.dist}})"})
