@@ -43,13 +43,17 @@ jobs:
           sudo apt-get install tree
           mkdir unpacked
           tar zxvf content/*.tgz -C unpacked/
-          ls -la unpacked/
+          # generate tree index on all directories
           for directory in `find unpacked/ -type d`
             do
               (cd $directory && tree -H '.' -L 1 --noreport --charset utf-8 | sed '/<p class="VERSION">/,/<\/p>/d' > index.html)
            done
-           ls -la unpacked/v3
-           cat unpacked/v3/index.html
+           # Make meta.yaml as index
+           for file in `find . -name "meta.yaml"`                                                                                                     ✔  12.19.1   docker-desktop ⎈
+             do
+               PARENT_DIR=$(dirname $file);
+               cp ${PARENT_DIR}/meta.yaml ${PARENT_DIR}/index.html
+             done
            export DEPLOY_DOMAIN=https://pr-check-${PR_NUMBER}-che-plugin-registry.surge.sh
            surge ./unpacked --domain $DEPLOY_DOMAIN
            
