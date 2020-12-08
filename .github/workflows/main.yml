@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-name: Image Build PR check
+name: Build
 
 on: [push, pull_request]
 
