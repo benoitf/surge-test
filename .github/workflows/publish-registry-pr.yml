@@ -18,12 +18,12 @@ jobs:
           name: plugin-registry-content-alpine
           path: content
       - name: generate-tree
-      run: |
-        sudo apt-get install tree
-        ls -la content/
-        for directory in `find content/ -type d`
-          do
-            (cd $directory && tree -H '.' -L 1 --noreport --charset utf-8 | sed '/<p class="VERSION">/,/<\/p>/d' > index.html)
-         done
-         ls -la content/
-         cat content/index.html
+        run: |
+          sudo apt-get install tree
+          ls -la content/
+          for directory in `find content/ -type d`
+            do
+              (cd $directory && tree -H '.' -L 1 --noreport --charset utf-8 | sed '/<p class="VERSION">/,/<\/p>/d' > index.html)
+           done
+           ls -la content/
+           cat content/index.html
