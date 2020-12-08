@@ -49,11 +49,9 @@ jobs:
               (cd $directory && tree -H '.' -L 1 --noreport --charset utf-8 | sed '/<p class="VERSION">/,/<\/p>/d' > index.html)
            done
            # Make meta.yaml as index
-           for file in `find unpacked -name "meta.yaml -type f"`                                                                                                     ✔  12.19.1   docker-desktop ⎈
+           for file in $(find unpacked -name 'meta.yaml' -type f)
              do
                PARENT_DIR=$(dirname $file);
-               echo "file is $file and PARENT_DIR is ${PARENT_DIR}"
-               echo "cp ${PARENT_DIR}/meta.yaml ${PARENT_DIR}/index.html"
                cp ${PARENT_DIR}/meta.yaml ${PARENT_DIR}/index.html
              done
            export DEPLOY_DOMAIN=https://pr-check-${PR_NUMBER}-che-plugin-registry.surge.sh
