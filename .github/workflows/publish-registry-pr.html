@@ -1,9 +1,7 @@
-name: Release
+name: Publish Registry
 on:
   workflow_run:
     workflows: [ "Image Build PR check" ]
-    branches:
-      - master
     types:
       - completed
 
