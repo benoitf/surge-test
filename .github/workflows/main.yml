@@ -41,3 +41,16 @@ jobs:
       with:
         name: plugin-registry-content-${{matrix.dist}}
         path: content-${{matrix.dist}}.tgz
+
+  pr-info:
+    runs-on: ubuntu-20.04
+    needs: [image-build]
+    steps:
+     - name: Store PR number
+       if: github.event_name == 'pull_request'
+       run: |
+         echo "${{ github.event.number }}" > PR_NUMBER
+     - uses: actions/upload-artifact@v2
+       with:
+         name: pull-request-number
+         path: PR_NUMBER
