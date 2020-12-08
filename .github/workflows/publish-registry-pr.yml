@@ -49,7 +49,7 @@ jobs:
               (cd $directory && tree -H '.' -L 1 --noreport --charset utf-8 | sed '/<p class="VERSION">/,/<\/p>/d' > index.html)
            done
            # Make meta.yaml as index
-           for file in `find . -name "meta.yaml"`                                                                                                     ✔  12.19.1   docker-desktop ⎈
+           for file in `find unpacked -name "meta.yaml"`                                                                                                     ✔  12.19.1   docker-desktop ⎈
              do
                PARENT_DIR=$(dirname $file);
                cp ${PARENT_DIR}/meta.yaml ${PARENT_DIR}/index.html
