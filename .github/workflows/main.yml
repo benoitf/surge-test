@@ -32,6 +32,12 @@ jobs:
         docker pull quay.io/eclipse/che-plugin-registry:nightly
         docker build -f ${FROM_FILE} -t local-plugin-registry .
         docker create --name pluginRegistry local-plugin-registry bash
-        docker cp pluginRegistry:/var/www/html/v3 v3
+        mkdir root-dir
+        docker cp pluginRegistry:/var/www/html/v3 root-dir/v3
         docker rm -f pluginRegistry
-        ls -la v3
+        cp root-dir/v3/plugins/index.json root-dir/index.json
+        tar zcvf content-${{matrix.dist}}.tgz -C root-dir .
+    - uses: actions/upload-artifact@v2
+      with:
+        name: plugin-registry-content-${{matrix.dist}}
+        path: content-${{matrix.dist}}.tgz
