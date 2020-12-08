@@ -34,13 +34,15 @@ jobs:
       - name: Publish
         run: |
           sudo apt-get install tree
-          tar zxvf content/*.tgz
-          ls -la content/
-          for directory in `find content/ -type d`
+          mkdir unpacked
+          tar zxvf content/*.tgz unpacked/
+          ls -la unpacked/
+          for directory in `find unpacked/ -type d`
             do
               (cd $directory && tree -H '.' -L 1 --noreport --charset utf-8 | sed '/<p class="VERSION">/,/<\/p>/d' > index.html)
            done
-           ls -la content/v3
-           cat content/v3/index.html
+           ls -la unpacked/v3
+           cat unpacked/v3/index.html
            export DEPLOY_DOMAIN=https://pr-check-${PR_NUMBER}-che-plugin-registry.surge.sh
+           surge ./unpacked --domain $DEPLOY_DOMAIN
            
