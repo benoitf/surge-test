@@ -35,6 +35,8 @@ jobs:
         with:
           node-version: '12'
       - name: publish
+        env:
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
         run: |
           sudo apt-get install tree
           npm install -g surge
