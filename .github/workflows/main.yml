@@ -7,9 +7,9 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-name: Build
+name: Image Build PR check
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   image-build:
@@ -43,14 +43,19 @@ jobs:
         path: content-${{matrix.dist}}.tgz
 
   pr-info:
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-20.04
     needs: [image-build]
     steps:
-     - name: Store PR number
-       if: ${{ github.event_name == 'pull_request' }}
+     - name: Store PR info
        run: |
          echo "${{ github.event.number }}" > PR_NUMBER
+         echo "${{ github.event.pull_request.head.sha }}" > PR_SHA
      - uses: actions/upload-artifact@v2
        with:
          name: pull-request-number
          path: PR_NUMBER
+     - uses: actions/upload-artifact@v2
+       with:
+         name: pull-request-sha
+         path: PR_SHA
