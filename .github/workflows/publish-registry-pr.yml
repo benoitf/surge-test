@@ -22,7 +22,8 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           workflow: ${{ github.event.workflow_run.workflow_id }}
-          name: pr-info
+          name: pull-request-number
+          path: PR_NUMBER
       - name: Apply pull request environment
         run: |
           pr_number=$(cat "PR_NUMBER")
