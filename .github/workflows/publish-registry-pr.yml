@@ -1,14 +1,27 @@
-name: Publish Registry
+#
+# Copyright (c) 2020 Red Hat, Inc.
+# This program and the accompanying materials are made
+# available under the terms of the Eclipse Public License 2.0
+# which is available at https://www.eclipse.org/legal/epl-2.0/
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+name: Publish Registry Content
 
 on:
   workflow_run:
-    workflows: ["Build"]
+    workflows: ["Image Build PR check"]
     types:
       - completed
 
 jobs:
   publish:
+    # only if it's a pull request
     if: github.event.workflow_run.event == 'pull_request'
+    strategy:
+      matrix:
+        dist: [ 'alpine', 'rhel' ]
     name: publish
     runs-on: ubuntu-20.04
     steps:
@@ -16,14 +29,14 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           workflow: ${{ github.event.workflow_run.workflow_id }}
-          name: plugin-registry-content-alpine
+          name: plugin-registry-content-${{matrix.dist}}
           path: content
       - name: PR number
         uses: dawidd6/action-download-artifact@v2
         with:
           workflow: ${{ github.event.workflow_run.workflow_id }}
           name: pull-request-number
-      - name: Apply pull request environment
+      - name: Grab pull request number
         run: |
           pr_number=$(cat "PR_NUMBER")
           if ! [[ "$pr_number" =~ ^[0-9]+$ ]]; then
@@ -31,6 +44,15 @@ jobs:
             exit 1
           fi
           echo "PR_NUMBER=$pr_number" >> $GITHUB_ENV
+      - name: PR sha
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: ${{ github.event.workflow_run.workflow_id }}
+          name: pull-request-sha
+      - name: Grab pull request sha1
+        run: |
+          pr_sha=$(cat "PR_SHA")
+          echo "PR_SHA=$pr_sha" >> $GITHUB_ENV
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '12'
@@ -40,7 +62,6 @@ jobs:
         run: |
           sudo apt-get install tree
           npm install -g surge
-          sudo apt-get install tree
           mkdir unpacked
           tar zxvf content/*.tgz -C unpacked/
           # generate tree index on all directories
@@ -54,6 +75,17 @@ jobs:
                PARENT_DIR=$(dirname $file);
                cp ${PARENT_DIR}/meta.yaml ${PARENT_DIR}/index.html
              done
-           export DEPLOY_DOMAIN=https://pr-check-${PR_NUMBER}-che-plugin-registry.surge.sh
+           export DEPLOY_DOMAIN=https://pr-check-${PR_NUMBER}-${{matrix.dist}}-che-plugin-registry.surge.sh
+           echo "DEPLOY_DOMAIN=$DEPLOY_DOMAIN" >> $GITHUB_ENV
            surge ./unpacked --domain $DEPLOY_DOMAIN
-           
+      - name: 'Comment PR'
+        uses: actions/github-script@v3.0.0
+        with:
+         script: |
+           const { repo: { owner, repo } } = context;
+           console.log('repo is', repo);
+           console.log('owner is', owner);
+           console.log('pr SHA is', process.env.PR_SHA);
+           console.log('DEPLOY_DOMAIN is', process.env.DEPLOY_DOMAIN);
+           const prSha = context.payload.pull_request.head.sha;
+           await github.repos.createCommitStatus({ owner, repo, sha: prSha, state: "success", target_url: process.env.DEPLOY_DOMAIN, description: "Browse registry content (${{matrix.dist}}) documentation live", context: "surge(${{matrix.dist}})"})
